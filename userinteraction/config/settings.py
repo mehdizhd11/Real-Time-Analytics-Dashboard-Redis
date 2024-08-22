@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+WSGI_APPLICATION = 'config.wsgi.application'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,6 +50,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'product.middleware.ProductMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -68,8 +72,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -81,6 +83,37 @@ DATABASES = {
         'PASSWORD': 'django1234',
         'HOST': 'localhost',
         'PORT': '5432',
+    }
+}
+
+REDIS_NODES = [
+    {"host": "127.0.0.1", "port": 7000},
+    {"host": "127.0.0.1", "port": 7001},
+    {"host": "127.0.0.1", "port": 7002},
+    {"host": "127.0.0.1", "port": 7003},
+    {"host": "127.0.0.1", "port": 7004},
+    {"host": "127.0.0.1", "port": 7005},
+]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': [
+            'redis://127.0.0.1:7000/1',
+            'redis://127.0.0.1:7001/1',
+            'redis://127.0.0.1:7002/1',
+            'redis://127.0.0.1:7003/1',
+            'redis://127.0.0.1:7004/1',
+            'redis://127.0.0.1:7005/1',
+        ],
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CONNECTION_POOL_CLASS': 'redis.cluster.ConnectionPool',
+            'CONNECTION_POOL_CLASS_KWARGS': {
+                'startup_nodes': REDIS_NODES,
+                'decode_responses': True,
+            },
+        }
     }
 }
 
